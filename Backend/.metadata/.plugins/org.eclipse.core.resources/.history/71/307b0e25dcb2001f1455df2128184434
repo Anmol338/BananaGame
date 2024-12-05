@@ -1,0 +1,48 @@
+package com.backend.server.entity;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name = "leaderboard")
+public class Leaderboard {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "user_email", nullable = false)
+    private String userEmail;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "level", nullable = false)
+    private GameLevel level;
+
+    @Column(name = "high_score", nullable = false)
+    private Integer highScore;
+
+    @Column(name = "date", nullable = false)
+    private java.sql.Date date;
+
+    @ManyToOne
+    @JoinColumn(name = "user_email", referencedColumnName = "email", insertable = false, updatable = false)
+    private User user;
+
+    public Leaderboard() {
+    }
+
+    public Leaderboard(Integer id, String userEmail, GameLevel level, Integer highScore, java.sql.Date date) {
+        this.id = id;
+        this.userEmail = userEmail;
+        this.level = level;
+        this.highScore = highScore;
+        this.date = date;
+    }
+
+    public enum GameLevel {
+        EASY,
+        MEDIUM,
+        HARD
+    }
+}

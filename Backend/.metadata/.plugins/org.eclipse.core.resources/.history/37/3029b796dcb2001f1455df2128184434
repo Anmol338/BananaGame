@@ -1,0 +1,65 @@
+package com.backend.server.service;
+
+import java.time.LocalDate;
+
+import org.springframework.stereotype.Service;
+
+import com.backend.server.entity.Game;
+import com.backend.server.entity.Leaderboard;
+import com.backend.server.repository.GameRepository;
+import com.backend.server.repository.LeaderboardRepository;
+import com.backend.server.repository.UserRepo;
+
+@Service
+public class GameService {
+
+    private final GameRepository gameRepository;
+    private final LeaderboardRepository leaderboardRepository;
+    private final UserRepo userRepository;
+    private final JWTUtils jwtUtils; // Inject JWTUtils for token parsing
+
+    public GameService(GameRepository gameRepository, LeaderboardRepository leaderboardRepository, 
+                       UserRepo userRepository, JWTUtils jwtUtils) {
+        this.gameRepository = gameRepository;
+        this.leaderboardRepository = leaderboardRepository;
+        this.userRepository = userRepository;
+        this.jwtUtils = jwtUtils;
+    }
+
+    public void saveGameData(String token, String level, int score) {
+        String userEmail = jwtUtils.extractUsername(token);
+        LocalDate currentDate = LocalDate.now();
+
+        // Update total games played for the user on the current date
+        updateGameStats(userEmail, level, currentDate);
+
+        // Update leaderboard with the daily high score
+        updateLeaderboard(userEmail, level, score, currentDate);
+    }
+
+    private void updateGameStats(String userEmail, String level, LocalDate currentDate) {
+        // Find or create a new Game record
+        Game game = gameRepository.findByUserEmailAndDatePlayed(userEmail, level, currentDate)
+                .orElseGet(() -> new Game(userEmail, level, currentDate, 0));
+
+        // Increment the total games played
+        game.setTotalGames(game.getTotalGames() + 1);
+
+        // Save the updated game record
+        gameRepository.save(game);
+    }
+
+    private void updateLeaderboard(String userEmail, String level, int score, LocalDate currentDate) {
+        // Find or create a new Leaderboard record
+        Leaderboard leaderboard = leaderboardRepository.findByUserEmailAndLevelAndDate(userEmail, level, currentDate)
+                .orElseGet(() -> new Leaderboard(userEmail, level, 0, currentDate));
+
+        // Update the high score if the current score is higher
+        if (score > leaderboard.getHighScore()) {
+            leaderboard.setHighScore(score);
+        }
+
+        // Save the updated leaderboard record
+        leaderboardRepository.save(leaderboard);
+    }
+}

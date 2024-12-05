@@ -1,0 +1,10 @@
+package com.backend.server.repository;
+
+import com.backend.server.entity.Game;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.sql.Date;
+import java.util.Optional;
+
+public interface GameRepository extends JpaRepository<Game, Integer> {
+    Optional<Game> findByUserEmailAndDatePlayed(String userEmail, Date datePlayed);
+}

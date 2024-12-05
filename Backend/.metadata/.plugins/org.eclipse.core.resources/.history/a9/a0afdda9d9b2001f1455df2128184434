@@ -1,0 +1,53 @@
+package com.backend.server.service;
+
+import java.time.LocalDate;
+
+import org.springframework.stereotype.Service;
+
+import com.backend.server.entity.Game;
+import com.backend.server.entity.Leaderboard;
+import com.backend.server.repository.GameRepository;
+import com.backend.server.repository.LeaderboardRepository;
+import com.backend.server.repository.UserRepo;
+
+@Service
+public class GameService {
+
+    private final GameRepository gameRepository;
+    private final LeaderboardRepository leaderboardRepository;
+    private final UserRepo userRepository;
+
+    public GameService(GameRepository gameRepository, LeaderboardRepository leaderboardRepository, UserRepository userRepository) {
+        this.gameRepository = gameRepository;
+        this.leaderboardRepository = leaderboardRepository;
+        this.userRepository = userRepository;
+    }
+
+    // Method to save game data
+    public void saveGameData(String token, String level, int score) {
+        String userEmail = JwtUtil.extractEmailFromToken(token);
+        LocalDate currentDate = LocalDate.now();
+
+        // Update the total number of games played
+        Game game = gameRepository.findByUserEmailAndDatePlayed(userEmail, currentDate)
+                .orElse(new Game(userEmail, level, currentDate));
+
+        game.setTotalGames(game.getTotalGames() + 1);
+        gameRepository.save(game);
+
+        // Update daily high score in leaderboard
+        updateLeaderboard(userEmail, level, score, currentDate);
+    }
+
+    // Method to update leaderboard with daily high score
+    private void updateLeaderboard(String userEmail, String level, int score, LocalDate currentDate) {
+        Leaderboard leaderboard = leaderboardRepository.findByUserEmailAndLevelAndDate(userEmail, level, currentDate)
+                .orElse(new Leaderboard(userEmail, level, score, currentDate));
+
+        // If the score is higher, update the leaderboard
+        if (score > leaderboard.getHighScore()) {
+            leaderboard.setHighScore(score);
+        }
+        leaderboardRepository.save(leaderboard);
+    }
+}

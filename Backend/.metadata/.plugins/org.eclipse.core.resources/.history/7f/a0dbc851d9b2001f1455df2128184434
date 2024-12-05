@@ -1,0 +1,11 @@
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.backend.server.entity.Leaderboard;
+import com.backend.server.entity.Leaderboard.GameLevel;
+
+import java.util.Optional;
+import java.time.LocalDate;
+
+public interface LeaderboardRepository extends JpaRepository<Leaderboard, Integer> {
+    Optional<Leaderboard> findByUserEmailAndLevelAndDate(String userEmail, GameLevel level, LocalDate date);
+}

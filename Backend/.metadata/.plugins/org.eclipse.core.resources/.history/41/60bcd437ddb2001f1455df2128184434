@@ -1,0 +1,99 @@
+package com.backend.server.entity;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.sql.Date;
+import java.time.LocalDate;
+
+@Data
+@Entity
+@Table(name = "games")
+public class Game {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "user_email", nullable = false)
+    private String userEmail;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "level", nullable = false)
+    private GameLevel level;
+
+    @Column(name = "date_played", nullable = false)
+    private LocalDate datePlayed;
+
+    @Column(name = "total_games", nullable = false)
+    private Integer totalGames = 0;
+
+    @ManyToOne
+    @JoinColumn(name = "user_email", referencedColumnName = "email", insertable = false, updatable = false)
+    private User user;
+
+    public Game() {
+        // No-argument constructor required for JPA
+    }
+
+    public Game(String userEmail, GameLevel level, LocalDate currentDate, Integer totalGames) {
+        this.userEmail = userEmail;
+        this.level = level;
+        this.datePlayed = currentDate;
+        this.totalGames = totalGames;
+    }
+
+    public enum GameLevel {
+        EASY,
+        MEDIUM,
+        HARD
+    }
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getUserEmail() {
+		return userEmail;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
+
+	public GameLevel getLevel() {
+		return level;
+	}
+
+	public void setLevel(GameLevel level) {
+		this.level = level;
+	}
+
+	public LocalDate getDatePlayed() {
+		return datePlayed;
+	}
+
+	public void setDatePlayed(LocalDate datePlayed) {
+		this.datePlayed = datePlayed;
+	}
+
+	public Integer getTotalGames() {
+		return totalGames;
+	}
+
+	public void setTotalGames(Integer totalGames) {
+		this.totalGames = totalGames;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+}

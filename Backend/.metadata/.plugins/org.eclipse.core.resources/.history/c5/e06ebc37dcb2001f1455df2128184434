@@ -1,0 +1,57 @@
+package com.backend.server.entity;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.sql.Date;
+
+@Data
+@Entity
+@Table(name = "games")
+public class Game {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "user_email", nullable = false)
+    private String userEmail;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "level", nullable = false)
+    private GameLevel level;
+
+    @Column(name = "date_played", nullable = false)
+    private Date datePlayed;
+
+    @Column(name = "total_games", nullable = false)
+    private Integer totalGames = 0;
+
+    @ManyToOne
+    @JoinColumn(name = "user_email", referencedColumnName = "email", insertable = false, updatable = false)
+    private User user;
+
+    public Game() {
+        // No-argument constructor required for JPA
+    }
+
+    public Game(String userEmail, GameLevel level, Date datePlayed, Integer totalGames) {
+        this.userEmail = userEmail;
+        this.level = level;
+        this.datePlayed = datePlayed;
+        this.totalGames = totalGames;
+    }
+
+    public Game(String userEmail, GameLevel level, Date datePlayed) {
+        this.userEmail = userEmail;
+        this.level = level;
+        this.datePlayed = datePlayed;
+        this.totalGames = 0; // Default value
+    }
+
+    public enum GameLevel {
+        EASY,
+        MEDIUM,
+        HARD
+    }
+}
