@@ -1,0 +1,5 @@
+package com.backend.server.dto;
+
+public class ValidationResponse {
+
+}

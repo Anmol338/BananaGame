@@ -1,0 +1,14 @@
+package com.backend.server.dto;
+
+public class AnswerRequest {
+    private String answer;
+
+    // Getter and Setter
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+}
